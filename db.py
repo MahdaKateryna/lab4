@@ -4,15 +4,20 @@ import os
 DATABASE_URL = os.getenv("postgresql://lab4_2xl1_user:CajMHHbPMlpsRPjYMlM4LsX8nuYksl6X@dpg-d0pkscmmcj7s73e94lug-a/lab4_2xl1")
 
 def get_connection():
-    return psycopg2.connect("postgresql://lab4_2xl1_user:CajMHHbPMlpsRPjYMlM4LsX8nuYksl6X@dpg-d0pkscmmcj7s73e94lug-a/lab4_2xl1")
+    return psycopg2.connect(DATABASE_URL)
 
-def insert_data(name, email):
+def create_users_table():
     with get_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("INSERT INTO users (name, email) VALUES (%s, %s)", (name, email))
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS users (
+                    id SERIAL PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    email TEXT NOT NULL
+                );
+            """)
 
-def get_all_data():
+def insert_user(name, email):
     with get_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT name, email FROM users")
-            return cur.fetchall()
+            cur.execute("INSERT INTO users (name, email) VALUES (%s, %s);", (name, email))

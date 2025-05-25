@@ -1,16 +1,26 @@
-from flask import Flask, render_template, request
-from db import insert_data, get_all_data
+from flask import Flask, request, jsonify
+from db import create_users_table, insert_user
 
 app = Flask(__name__)
 
-@app.route("/", methods=["GET", "POST"])
-def index():
-    if request.method == "POST":
-        name = request.form["name"]
-        email = request.form["email"]
-        insert_data(name, email)
-    data = get_all_data()
-    return render_template("index.html", data=data)
+@app.route("/create-table", methods=["GET"])
+def create_table_route():
+    try:
+        create_users_table()
+        return "Таблиця users створена або вже існує.", 200
+    except Exception as e:
+        return f"Помилка при створенні таблиці: {e}", 500
+
+@app.route("/add-user", methods=["POST"])
+def add_user_route():
+    try:
+        data = request.get_json()
+        name = data["name"]
+        email = data["email"]
+        insert_user(name, email)
+        return jsonify({"status": "успішно додано", "name": name, "email": email}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,7 +1,7 @@
 import psycopg2
 import os
 
-DATABASE_URL = os.getenv("postgresql://lab4_2xl1_user:CajMHHbPMlpsRPjYMlM4LsX8nuYksl6X@dpg-d0pkscmmcj7s73e94lug-a.oregon-postgres.render.com/lab4_2xl1")  # Render provides this automatically
+DATABASE_URL = os.getenv("DATABASE_URL")  # Render provides this automatically
 
 def get_connection():
     return psycopg2.connect(DATABASE_URL)

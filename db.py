@@ -5,7 +5,6 @@ DATABASE_URL = os.getenv("DATABASE_URL")  # Render provides this automatically
 
 def get_connection():
     return psycopg2.connect(DATABASE_URL)
-
 def create_users_table():
     with get_connection() as conn:
         with conn.cursor() as cur:

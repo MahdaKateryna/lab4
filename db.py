@@ -1,12 +1,23 @@
 import psycopg2
 import os
 
-def get_db_connection():
-    return psycopg2.connect(
-        url=os.getenv("postgresql://lab4_2xl1_user:CajMHHbPMlpsRPjYMlM4LsX8nuYksl6X@dpg-d0pkscmmcj7s73e94lug-a/lab4_2xl1"),
-        dbname=os.getenv("lab4_2xl1"),
-        user=os.getenv("lab4_2xl1_user"),
-        password=os.getenv("CajMHHbPMlpsRPjYMlM4LsX8nuYksl6X"),
-        host=os.getenv("dpg-d0pkscmmcj7s73e94lug-a"),
-        port=os.getenv("5432")
-    )
+DATABASE_URL = os.getenv("postgresql://lab4_2xl1_user:CajMHHbPMlpsRPjYMlM4LsX8nuYksl6X@dpg-d0pkscmmcj7s73e94lug-a.oregon-postgres.render.com/lab4_2xl1")  # Render provides this automatically
+
+def get_connection():
+    return psycopg2.connect(DATABASE_URL)
+
+def create_users_table():
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS users (
+                    id SERIAL PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    email TEXT NOT NULL
+                );
+            """)
+
+def insert_user(name, email):
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("INSERT INTO users (name, email) VALUES (%s, %s);", (name, email))

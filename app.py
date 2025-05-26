@@ -3,6 +3,9 @@ from db import create_users_table, insert_user
 import os
 
 app = Flask(__name__)
+@app.route("/")
+def home():
+    return "🟢 Додаток працює!"
 
 @app.route("/create-table", methods=["GET"])
 def create_table_route():

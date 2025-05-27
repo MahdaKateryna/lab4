@@ -1,31 +1,34 @@
 from flask import Flask, request, jsonify
-from db import create_users_table, insert_user
-import os
+from db import get_connection, create_table
 
 app = Flask(__name__)
+create_table()
+
+
 @app.route("/")
-def home():
-    return "Додаток працює!"
+def index():
+    return "Lab 4 is running with PostgreSQL!"
 
-@app.route("/create-table", methods=["GET"])
-def create_table_route():
-    try:
-        create_users_table()
-        return "Таблиця users створена або вже існує.", 200
-    except Exception as e:
-        return f"Помилка при створенні таблиці: {e}", 500
 
-@app.route("/add-user", methods=["POST"])
-def add_user_route():
-    try:
-        data = request.get_json()
-        name = data["name"]
-        email = data["email"]
-        insert_user(name, email)
-        return jsonify({"status": "успішно додано", "name": name, "email": email}), 201
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400
+@app.route("/add", methods=["POST"])
+def add_user():
+    data = request.get_json()
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("INSERT INTO users (name, email) VALUES (%s, %s)",
+                (data["name"], data["email"]))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return jsonify({"status": "success"}), 201
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # Required for Render
-    app.run(host="0.0.0.0", port=port)
+
+@app.route("/users", methods=["GET"])
+def get_users():
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM users")
+    users = cur.fetchall()
+    cur.close()
+    conn.close()
+    return jsonify(users)

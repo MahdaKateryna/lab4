@@ -2,7 +2,6 @@ services:
   - type: web
     name: lab4
     env: python
-    ...
     envVars:
       - fromDatabase:
           name: lab4-db

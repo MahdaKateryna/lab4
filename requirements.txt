@@ -1,2 +1,4 @@
 psycopg2-binary
 gunicorn
+psycopg2~=2.9.10
+Flask~=3.1.1
